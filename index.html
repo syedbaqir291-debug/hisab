@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hisab Khata</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b3d36">
+<style>
+:root{--ink:#0b3d36;--paper:#eef3ef;--card:#fff;--line:#d5e0d9;--gold:#f2a900;--red:#b3261e;--grn:#1a7a4c;--mut:#5d7a72}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:#17302b;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;padding:14px}
+h1,h2{font-family:Georgia,"Times New Roman",serif;margin:0}
+.top{background:var(--ink);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+.top img{width:34px;height:34px;border-radius:9px}.top h1{font-size:20px;flex:1}
+.top small{opacity:.75;display:block;font:12px system-ui}
+button,input,select{font:inherit}
+input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;margin-top:4px}
+label{font-size:13px;color:var(--mut);display:block;margin-top:10px}
+.btn{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:600}
+.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}.btn.gold{background:var(--gold);color:#3a2700}
+.btn.sm{padding:6px 10px;font-size:13px}.top .btn{background:#ffffff22}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:12px}
+.auth{min-height:100vh;display:grid;place-items:center;background:var(--ink);padding:16px}
+.auth .card{width:100%;max-width:380px;text-align:center}.auth img{width:84px;border-radius:20px}
+.auth h1{margin:8px 0 2px}.tabs{display:flex;gap:6px;margin:12px 0}.tabs button{flex:1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px}
+.stat b{display:block;font:700 18px Georgia,serif}.stat span{font-size:12px;color:var(--mut)}
+.k{color:var(--red)}.c{color:#9a6700}.j{color:var(--grn)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg{display:flex;gap:6px;margin-top:6px}.seg button{flex:1;padding:9px 4px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer}
+.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.day{margin-top:14px;border-left:4px solid var(--gold);background:var(--card);border-radius:0 10px 10px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.dh{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#f6faf7;font-weight:600}
+.dh span{font-weight:500;font-size:13px}
+.it{display:flex;gap:8px;align-items:center;padding:9px 12px;border-top:1px dashed var(--line)}
+.it .m{flex:1;min-width:0}.it .m small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis}
+.it .a{font:700 16px Georgia,serif;white-space:nowrap}
+.tag{font-size:11px;padding:1px 7px;border-radius:9px;background:#e2ece6;color:var(--ink);margin-left:4px}
+.x{background:none;border:0;color:var(--mut);font-size:18px;cursor:pointer}
+.err{color:var(--red);font-size:13px;min-height:18px;margin-top:8px}
+.empty{text-align:center;color:var(--mut);padding:28px 10px}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}
+</style></head><body>
+
+<div id="auth" class="auth"><div class="card">
+ <img src="icons/icon-192.png" alt="logo"><h1>Hisab Khata</h1><small style="color:var(--mut)">Kharcha, cash aur jama ka poora hisab</small>
+ <div class="tabs"><button class="btn" id="tl" onclick="tab('l')">Login</button><button class="btn alt" id="tr" onclick="tab('r')">Naya Account</button></div>
+ <div id="rn" hidden><label style="text-align:left">Naam<input id="name" placeholder="Apna naam"></label></div>
+ <label style="text-align:left">Username<input id="u" autocapitalize="none" placeholder="e.g. syed"></label>
+ <label style="text-align:left"><span id="pl">Password (agar lagaya ho)</span><input id="p" type="password" placeholder="Khali chhor sakte hain"></label>
+ <div class="err" id="ae"></div>
+ <button class="btn" style="width:100%" id="go" onclick="auth()">Login</button>
+ <button class="btn alt sm" style="margin-top:10px" id="inst" hidden>App install karein</button>
+</div></div>
+
+<div id="app" hidden>
+ <div class="top"><img src="icons/icon-192.png" alt=""><h1>Hisab Khata<small id="who"></small></h1>
+  <button class="btn sm" onclick="document.getElementById('set').hidden=!document.getElementById('set').hidden">Settings</button>
+  <button class="btn sm" onclick="logout()">Logout</button></div>
+ <div class="wrap">
+  <div id="set" class="card" hidden>
+   <b>Password</b> <small style="color:var(--mut)">(khali = bina password)</small>
+   <input id="np" placeholder="Naya password, ya khali rakhein"><button class="btn sm" style="margin-top:8px" onclick="setPass()">Save password</button>
+  </div>
+  <div id="adm" class="card" hidden>
+   <b>Master Admin</b>
+   <label>Account select karein<select id="tgt" onchange="load()"></select></label>
+   <div style="overflow:auto;margin-top:10px"><table id="ut"></table></div>
+  </div>
+  <div class="stats" id="stats"></div>
+
+  <div class="card"><b>Naya entry</b>
+   <div class="seg" id="seg"><button data-t="kharcha" class="on">Kharcha</button><button data-t="cash">Cash Nikala</button><button data-t="jama">Jama</button></div>
+   <div class="row2"><label>Amount<input id="amt" type="number" inputmode="decimal" min="0" placeholder="0"></label><label>Date<input id="dt" type="date"></label></div>
+   <div class="row2"><label>Category<input id="cat" list="cats" placeholder="Khana, Safar..."></label><label>Note<input id="note" placeholder="Kis liye?"></label></div>
+   <datalist id="cats"><option>Khana</option><option>Safar</option><option>Bill</option><option>Kiraya</option><option>Shopping</option><option>Dawai</option><option>Udhaar</option><option>ATM</option><option>Other</option></datalist>
+   <div class="err" id="ee"></div><button class="btn gold" style="width:100%" onclick="add()">Entry save karein</button>
+  </div>
+
+  <div class="card"><b>Date wise hisab</b>
+   <div class="row2"><label>Se<input id="f" type="date" onchange="render()"></label><label>Tak<input id="t" type="date" onchange="render()"></label></div>
+   <div class="row2"><label>Type<select id="ft" onchange="render()"><option value="">Sab</option><option value="kharcha">Kharcha</option><option value="cash">Cash Nikala</option><option value="jama">Jama</option></select></label><label>Search<input id="q" oninput="render()" placeholder="category / note"></label></div>
+   <div class="seg"><button onclick="quick('today')">Aaj</button><button onclick="quick('month')">Is Mahina</button><button onclick="quick('')">Sab</button></div>
+  </div>
+  <div id="list"></div>
+ </div>
+</div>
+
+<script>
+const API="PASTE_WEB_APP_URL_HERE"; // Apps Script Web App URL yahan lagayen
+const $=id=>document.getElementById(id);
+let S=null,E=[],US=[],mode='l',type='kharcha';
+try{S=JSON.parse(localStorage.hk||'null')}catch(e){}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const n=x=>Number(x).toLocaleString('en-PK',{maximumFractionDigits:2});
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const NM={kharcha:'Kharcha',cash:'Cash Nikala',jama:'Jama'};
+async function api(action,d={}){
+  if(API.startsWith('PASTE'))throw Error('index.html me API URL nahi lagaya');
+  const r=await fetch(API,{method:'POST',body:JSON.stringify({action,username:S&&S.username,password:S&&S.password,...d})});
+  const j=await r.json();if(!j.ok)throw Error(j.error);return j;
+}
+function tab(m){mode=m;$('rn').hidden=m=='l';$('go').textContent=m=='l'?'Login':'Account banayein';
+ $('tl').className='btn'+(m=='l'?'':' alt');$('tr').className='btn'+(m=='r'?'':' alt');
+ $('pl').textContent=m=='l'?'Password (agar lagaya ho)':'Password (optional, khali = bina password)';$('ae').textContent=''}
+async function auth(){
+  $('ae').textContent='';$('go').disabled=true;
+  try{const username=$('u').value.trim().toLowerCase(),password=$('p').value;
+    const j=await api(mode=='l'?'login':'register',{username,password,name:$('name').value});
+    S={username,password};localStorage.hk=JSON.stringify(S);enter(j.user);
+  }catch(e){$('ae').textContent=e.message}$('go').disabled=false}
+function enter(u){S.role=u.role;S.name=u.name;$('auth').hidden=true;$('app').hidden=false;
+  $('who').textContent=u.name+(u.role=='admin'?' (Master Admin)':'');$('adm').hidden=u.role!='admin';
+  $('np').value=S.password||'';$('dt').value=iso(new Date());load()}
+function logout(){localStorage.removeItem('hk');location.reload()}
+async function load(){
+  try{const j=await api('list',{target:$('tgt').value||S.username});E=j.entries;
+    if(j.users){US=j.users;const cur=$('tgt').value||S.username;
+      $('tgt').innerHTML='<option value="all">Sab Accounts</option>'+US.map(u=>`<option value="${esc(u.username)}">${esc(u.name)} (${esc(u.username)})</option>`).join('');
+      $('tgt').value=[...$('tgt').options].some(o=>o.value==cur)?cur:S.username;
+      $('ut').innerHTML='<tr><th>User</th><th>Password</th><th></th></tr>'+US.map(u=>`<tr><td>${esc(u.name)}<br><small>${esc(u.username)}</small></td><td>${esc(u.password)||'<i>nahi</i>'}</td><td>${u.role=='admin'?'':`<button class="x" onclick="delUser('${esc(u.username)}')">🗑</button>`}</td></tr>`).join('')}
+    render()}catch(e){$('list').innerHTML=`<div class="empty">${esc(e.message)}</div>`;if(/Password|Account/.test(e.message))logout()}}
+function quick(k){const d=new Date();if(k=='today')$('f').value=$('t').value=iso(d);
+  else if(k=='month'){$('f').value=iso(new Date(d.getFullYear(),d.getMonth(),1));$('t').value=iso(d)}else $('f').value=$('t').value='';render()}
+function render(){
+  const f=$('f').value,t=$('t').value,ty=$('ft').value,q=$('q').value.toLowerCase();
+  const L=E.filter(e=>(!f||e.date>=f)&&(!t||e.date<=t)&&(!ty||e.type==ty)&&(!q||(e.category+' '+e.note).toLowerCase().includes(q)))
+    .sort((a,b)=>b.date.localeCompare(a.date)||b.created.localeCompare(a.created));
+  const sum=k=>L.filter(e=>e.type==k).reduce((s,e)=>s+Number(e.amount),0);
+  $('stats').innerHTML=`<div class="stat"><span>Kul Kharcha</span><b class="k">${n(sum('kharcha'))}</b></div><div class="stat"><span>Cash Nikala</span><b class="c">${n(sum('cash'))}</b></div><div class="stat"><span>Jama</span><b class="j">${n(sum('jama'))}</b></div>`;
+  if(!L.length){$('list').innerHTML='<div class="empty">Koi entry nahi. Upar se pehla entry add karein.</div>';return}
+  const G={};L.forEach(e=>(G[e.date]=G[e.date]||[]).push(e));
+  $('list').innerHTML=Object.keys(G).sort().reverse().map(d=>{const g=G[d],s=k=>g.filter(e=>e.type==k).reduce((a,e)=>a+Number(e.amount),0);
+    const dn=new Date(d+'T00:00').toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+    return `<div class="day"><div class="dh"><div>${dn}</div><span><b class="k">Kharcha ${n(s('kharcha'))}</b> · <b class="c">Cash ${n(s('cash'))}</b> · <b class="j">Jama ${n(s('jama'))}</b></span></div>`+
+     g.map(e=>`<div class="it"><div class="m">${esc(e.category)||NM[e.type]}<span class="tag">${NM[e.type]}</span>${$('tgt').value=='all'?`<span class="tag">${esc(e.username)}</span>`:''}<small>${esc(e.note)}</small></div><div class="a ${e.type=='kharcha'?'k':e.type=='cash'?'c':'j'}">${e.type=='jama'?'+':'−'}${n(e.amount)}</div><button class="x" onclick="del('${e.id}')">✕</button></div>`).join('')+'</div>'}).join('')}
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{type=b.dataset.t;document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x==b))});
+async function add(){$('ee').textContent='';
+  try{const o=$('tgt').value;await api('add',{type,amount:$('amt').value,date:$('dt').value,category:$('cat').value,note:$('note').value,owner:S.role=='admin'&&o&&o!='all'?o:''});
+    $('amt').value=$('note').value=$('cat').value='';await load()}catch(e){$('ee').textContent=e.message}}
+async function del(id){if(!confirm('Ye entry delete karein?'))return;try{await api('delete',{id});load()}catch(e){alert(e.message)}}
+async function delUser(u){if(!confirm(u+' ka account aur uska saara hisab delete karein?'))return;try{await api('deleteUser',{target:u});load()}catch(e){alert(e.message)}}
+async function setPass(){try{const p=$('np').value;await api('setpass',{newPassword:p});S.password=p;localStorage.hk=JSON.stringify(S);alert(p?'Password lag gaya':'Password hata diya')}catch(e){alert(e.message)}}
+if(S)api('login').then(j=>enter(j.user)).catch(()=>{localStorage.removeItem('hk');S=null});
+let dp;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('inst').hidden=false});
+$('inst').onclick=()=>dp&&dp.prompt();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+</script></body></html>
